@@ -1,5 +1,5 @@
 #include <jni.h>
-#include "../Utils/logHelp.h"
+#include "../FFmpeg/Utils/logHelp.h"
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
 

@@ -1,7 +1,7 @@
 #include <jni.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <Utils/logHelp.h>
+#include <FFmpeg/Utils/logHelp.h>
 #include<string>
 #include<iostream>
 
@@ -77,7 +77,7 @@ string getVideoTime(AVFormatContext *avFormatContext)
 
 extern "C" JNIEXPORT jstring JNICALL
 Java_com_leachchen_testffmpeg_MainActivity_getVideoInfo(JNIEnv *env, jobject instance,
-                                                      jstring filePath_) {
+                                                        jstring filePath_) {
     string info = "";
     const char *filePath = (char *) env->GetStringUTFChars(filePath_, 0);
     av_register_all();
