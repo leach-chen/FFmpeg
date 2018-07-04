@@ -34,7 +34,7 @@ string itos(int i) {
 
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_com_example_testffmpeg_MainActivity_test(JNIEnv *env, jobject instance, jstring str) {
+Java_com_leachchen_testffmpeg_MainActivity_test(JNIEnv *env, jobject instance, jstring str) {
     char *st = (char *) env->GetStringUTFChars(str, 0);
     char *newStr = "-->this is jni value";
     char *result = (char *) malloc(sizeof(st) + sizeof(newStr) + 2);
@@ -76,7 +76,7 @@ string getVideoTime(AVFormatContext *avFormatContext)
 }
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_com_example_testffmpeg_MainActivity_getVideoInfo(JNIEnv *env, jobject instance,
+Java_com_leachchen_testffmpeg_MainActivity_getVideoInfo(JNIEnv *env, jobject instance,
                                                       jstring filePath_) {
     string info = "";
     const char *filePath = (char *) env->GetStringUTFChars(filePath_, 0);

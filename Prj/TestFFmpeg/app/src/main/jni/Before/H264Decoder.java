@@ -27,7 +27,7 @@
  *  
  */
 
-package com.leachchen.testffmpeg;
+package Before;
 
 import java.nio.ByteBuffer;
 
