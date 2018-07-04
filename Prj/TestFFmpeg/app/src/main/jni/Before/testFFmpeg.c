@@ -5,7 +5,7 @@
 
 
 JNIEXPORT jstring JNICALL
-Java_com_example_testffmpeg_MainActivity_test(JNIEnv *env, jobject instance, jstring str) {
+Java_com_leachchen_testffmpeg_MainActivity_test(JNIEnv *env, jobject instance, jstring str) {
     char *st = (*env)->GetStringUTFChars(env,str,0);
     char *newStr = "-->this is jni value";
     char * result = malloc(sizeof(st)+ sizeof(newStr)+2);
@@ -19,7 +19,7 @@ Java_com_example_testffmpeg_MainActivity_test(JNIEnv *env, jobject instance, jst
 
 
 JNIEXPORT jstring JNICALL
-Java_com_example_testffmpeg_MainActivity_getVideoInfo(JNIEnv *env, jobject instance,jstring filePath_) {
+Java_com_leachchen_testffmpeg_MainActivity_getVideoInfo(JNIEnv *env, jobject instance,jstring filePath_) {
     const char *filePath = (*env)->GetStringUTFChars(env, filePath_, 0);
     char info[10000] = {0};
     avcodec_register_all();

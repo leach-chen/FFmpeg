@@ -1,3 +1,4 @@
+/*
 package Before;
 
 import android.os.Bundle;
@@ -71,3 +72,4 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
     }
 }
+*/

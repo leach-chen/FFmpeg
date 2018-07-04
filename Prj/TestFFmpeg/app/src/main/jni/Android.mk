@@ -29,7 +29,7 @@ include $(CLEAR_VARS)
 
 
 
-LOCAL_SRC_FILES := testFFmpeg.cpp
+LOCAL_SRC_FILES := testFFmpeg.c
 LOCAL_LDLIBS += -llog -lz -landroid
 LOCAL_MODULE := VideoPlayer
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/FFmpeg/include
