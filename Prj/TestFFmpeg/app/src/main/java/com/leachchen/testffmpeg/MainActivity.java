@@ -21,6 +21,6 @@ public class MainActivity extends AppCompatActivity {
     public native void test();
 
     static {
-        System.loadLibrary("VideoPlayer");
+        System.loadLibrary("testFFmpeg");
     }
 }

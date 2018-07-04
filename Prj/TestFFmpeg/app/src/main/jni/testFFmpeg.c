@@ -36,21 +36,20 @@ static const char *type_string(int type)
 
 static int list_op(const char *input_dir)
 {
-    LOGE("bbbb");
     AVIODirEntry *entry = NULL;
     AVIODirContext *ctx = NULL;
     int cnt, ret;
     char filemode[4], uid_and_gid[20];
 
     if ((ret = avio_open_dir(&ctx, input_dir, NULL)) < 0) {
-        av_log(NULL, AV_LOG_ERROR, "Cannot open directory: %s.\n", av_err2str(ret));
+        LOGE("Cannot open directory: %s.\n", av_err2str(ret));
         goto fail;
     }
 
     cnt = 0;
     for (;;) {
         if ((ret = avio_read_dir(ctx, &entry)) < 0) {
-            av_log(NULL, AV_LOG_ERROR, "Cannot list directory: %s.\n", av_err2str(ret));
+            LOGE("Cannot list directory: %s.\n", av_err2str(ret));
             goto fail;
         }
         if (!entry)
@@ -62,10 +61,10 @@ static int list_op(const char *input_dir)
         }
         snprintf(uid_and_gid, 20, "%"PRId64"(%"PRId64")", entry->user_id, entry->group_id);
         if (cnt == 0)
-            av_log(NULL, AV_LOG_INFO, "%-9s %12s %30s %10s %s %16s %16s %16s\n",
+            LOGE("%-9s %12s %30s %10s %s %16s %16s %16s\n",
                    "TYPE", "SIZE", "NAME", "UID(GID)", "UGO", "MODIFIED",
                    "ACCESSED", "STATUS_CHANGED");
-        av_log(NULL, AV_LOG_INFO, "%-9s %12"PRId64" %30s %10s %s %16"PRId64" %16"PRId64" %16"PRId64"\n",
+        LOGE("%-9s %12"PRId64" %30s %10s %s %16"PRId64" %16"PRId64" %16"PRId64"\n",
                type_string(entry->type),
                entry->size,
                entry->name,
@@ -87,7 +86,7 @@ static int del_op(const char *url)
 {
     int ret = avpriv_io_delete(url);
     if (ret < 0)
-        av_log(NULL, AV_LOG_ERROR, "Cannot delete '%s': %s.\n", url, av_err2str(ret));
+        LOGE("Cannot delete '%s': %s.\n", url, av_err2str(ret));
     return ret;
 }
 
@@ -95,7 +94,7 @@ static int move_op(const char *src, const char *dst)
 {
     int ret = avpriv_io_move(src, dst);
     if (ret < 0)
-        av_log(NULL, AV_LOG_ERROR, "Cannot move '%s' into '%s': %s.\n", src, dst, av_err2str(ret));
+        LOGE("Cannot move '%s' into '%s': %s.\n", src, dst, av_err2str(ret));
     return ret;
 }
 
@@ -115,8 +114,6 @@ static void usage(const char *program_name)
 JNIEXPORT void JNICALL
 Java_com_leachchen_testffmpeg_MainActivity_test(JNIEnv *env, jobject instance) {
 
-    LOGE("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-    av_log_set_level(AV_LOG_DEBUG);
     avformat_network_init();
 
 /*   list_op(argv[2]);
@@ -124,7 +121,7 @@ Java_com_leachchen_testffmpeg_MainActivity_test(JNIEnv *env, jobject instance) {
     move_op(argv[2], argv[3]);*/
 
 
-    list_op("/sdcard/vava");
+    list_op("/sdcard/android/");
 
     avformat_network_deinit();
 }
