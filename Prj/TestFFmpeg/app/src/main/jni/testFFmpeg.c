@@ -4,124 +4,86 @@
 #include <jni.h>
 #include <FFmpeg/Utils/logHelp.h>
 
-static const char *type_string(int type)
-{
-    switch (type) {
-        case AVIO_ENTRY_DIRECTORY:
-            return "<DIR>";
-        case AVIO_ENTRY_FILE:
-            return "<FILE>";
-        case AVIO_ENTRY_BLOCK_DEVICE:
-            return "<BLOCK DEVICE>";
-        case AVIO_ENTRY_CHARACTER_DEVICE:
-            return "<CHARACTER DEVICE>";
-        case AVIO_ENTRY_NAMED_PIPE:
-            return "<PIPE>";
-        case AVIO_ENTRY_SYMBOLIC_LINK:
-            return "<LINK>";
-        case AVIO_ENTRY_SOCKET:
-            return "<SOCKET>";
-        case AVIO_ENTRY_SERVER:
-            return "<SERVER>";
-        case AVIO_ENTRY_SHARE:
-            return "<SHARE>";
-        case AVIO_ENTRY_WORKGROUP:
-            return "<WORKGROUP>";
-        case AVIO_ENTRY_UNKNOWN:
-        default:
-            break;
-    }
-    return "<UNKNOWN>";
-}
+/*
+error: 'for' loop initial declarations are only allowed in C99 or C11 mode
+note: use option -std=c99, -std=gnu99, -std=c11 or -std=gnu11 to compile your code
 
-static int list_op(const char *input_dir)
-{
-    AVIODirEntry *entry = NULL;
-    AVIODirContext *ctx = NULL;
-    int cnt, ret;
-    char filemode[4], uid_and_gid[20];
+LOCAL_CFLAGS       := -DANDROID -D__STDC_CONSTANT_MACROS -std=gnu++11
+LOCAL_CPPFLAGS       := -w -fexceptions -frtti
+LOCAL_CPPFLAGS          += -std=c++11
 
-    if ((ret = avio_open_dir(&ctx, input_dir, NULL)) < 0) {
-        LOGE("Cannot open directory: %s.\n", av_err2str(ret));
-        goto fail;
+ */
+
+JNIEXPORT jstring JNICALL
+Java_com_leachchen_testffmpeg_MainActivity_getVideoInfo(JNIEnv *env, jobject instance,
+                                                        jstring videoPath_) {
+    const char *videoPath = (*env)->GetStringUTFChars(env, videoPath_, 0);
+    jstring str = (*env)->NewStringUTF(env, videoPath);
+    //(*env)->ReleaseStringUTFChars(env, videoPath_, videoPath);
+
+    AVFormatContext *avFormatContext;   //格式信息结构体
+    AVCodecContext *avCodecContext; //编解码信息结构体
+    av_register_all(); //注册所有组件
+
+    if (avformat_open_input(&avFormatContext, videoPath, NULL, NULL) != 0)   //打开输入视频文件
+    {
+        LOGE("open video fail!");
+        return (*env)->NewStringUTF(env,"open video fail!");
     }
 
-    cnt = 0;
-    for (;;) {
-        if ((ret = avio_read_dir(ctx, &entry)) < 0) {
-            LOGE("Cannot list directory: %s.\n", av_err2str(ret));
-            goto fail;
-        }
-        if (!entry)
+    if (avformat_find_stream_info(avFormatContext, NULL) < 0) {
+        LOGE("can't find stream info!");
+        return (*env)->NewStringUTF(env,"can't find stream info!");
+    }
+
+    int videoIndex = -1;
+    for (int i = 0; i < avFormatContext->nb_streams; i++) {
+        if (avFormatContext->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO)        //为视频流类型
+        {
+            videoIndex = i;
             break;
-        if (entry->filemode == -1) {
-            snprintf(filemode, 4, "???");
-        } else {
-            snprintf(filemode, 4, "%3"PRIo64, entry->filemode);
         }
-        snprintf(uid_and_gid, 20, "%"PRId64"(%"PRId64")", entry->user_id, entry->group_id);
-        if (cnt == 0)
-            LOGE("%-9s %12s %30s %10s %s %16s %16s %16s\n",
-                   "TYPE", "SIZE", "NAME", "UID(GID)", "UGO", "MODIFIED",
-                   "ACCESSED", "STATUS_CHANGED");
-        LOGE("%-9s %12"PRId64" %30s %10s %s %16"PRId64" %16"PRId64" %16"PRId64"\n",
-               type_string(entry->type),
-               entry->size,
-               entry->name,
-               uid_and_gid,
-               filemode,
-               entry->modification_timestamp,
-               entry->access_timestamp,
-               entry->status_change_timestamp);
-        avio_free_directory_entry(&entry);
-        cnt++;
-    };
+    }
 
-    fail:
-    avio_close_dir(&ctx);
-    return ret;
-}
+    if(videoIndex == -1)
+    {
+        LOGE("can't find video stream info!");
+        return (*env)->NewStringUTF(env,"can't find video stream info!");
+    }
 
-static int del_op(const char *url)
-{
-    int ret = avpriv_io_delete(url);
-    if (ret < 0)
-        LOGE("Cannot delete '%s': %s.\n", url, av_err2str(ret));
-    return ret;
-}
+    avCodecContext = avFormatContext->streams[videoIndex]->codec;
+    AVCodec *avCodec = avcodec_find_decoder(avCodecContext->codec_id); //找到解码器
+    if(avCodec == NULL)
+    {
+        LOGE("can't find video decoder!");
+        return (*env)->NewStringUTF(env,"can't find video decoder!");
+    }
 
-static int move_op(const char *src, const char *dst)
-{
-    int ret = avpriv_io_move(src, dst);
-    if (ret < 0)
-        LOGE("Cannot move '%s' into '%s': %s.\n", src, dst, av_err2str(ret));
-    return ret;
-}
+    if(avcodec_open2(avCodecContext,avCodec,NULL) < 0)
+    {
+        LOGE("can't find open codec!");
+        return (*env)->NewStringUTF(env,"can't find open codec!");
+    }
 
 
-static void usage(const char *program_name)
-{
-    fprintf(stderr, "usage: %s OPERATION entry1 [entry2]\n"
-                    "API example program to show how to manipulate resources "
-                    "accessed through AVIOContext.\n"
-                    "OPERATIONS:\n"
-                    "list      list content of the directory\n"
-                    "move      rename content in directory\n"
-                    "del       delete content in directory\n",
-            program_name);
-}
+    int autioIndex = -1;
+    for (int i = 0; i < avFormatContext->nb_streams; i++) {
+        if (avFormatContext->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO)        //为视频流类型
+        {
+            autioIndex = i;
+            break;
+        }
+    }
 
-JNIEXPORT void JNICALL
-Java_com_leachchen_testffmpeg_MainActivity_test(JNIEnv *env, jobject instance) {
+    if(autioIndex == -1)
+    {
+        LOGE("can't find audio stream info!");
+        return (*env)->NewStringUTF(env,"can't find audio stream info!");
+    }
 
-    avformat_network_init();
+    char  *stt = "aaaaaa";
+    char buf[100] = {0};
+    sprintf(buf,"%s",stt);
 
-/*   list_op(argv[2]);
-    del_op(argv[2]);
-    move_op(argv[2], argv[3]);*/
-
-
-    list_op("/sdcard/android/");
-
-    avformat_network_deinit();
+    return (*env)->NewStringUTF(env,&buf);
 }
