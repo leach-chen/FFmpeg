@@ -21,7 +21,7 @@ Java_com_leachchen_testffmpeg_MainActivity_getVideoInfo(JNIEnv *env, jobject ins
     jstring str = (*env)->NewStringUTF(env, videoPath);
     //(*env)->ReleaseStringUTFChars(env, videoPath_, videoPath);
 
-    AVFormatContext *avFormatContext;   //格式信息结构体
+    AVFormatContext *avFormatContext = avformat_alloc_context();   //格式信息结构体
     AVCodecContext *avCodecContext; //编解码信息结构体
     av_register_all(); //注册所有组件
 
@@ -81,9 +81,8 @@ Java_com_leachchen_testffmpeg_MainActivity_getVideoInfo(JNIEnv *env, jobject ins
         return (*env)->NewStringUTF(env,"can't find audio stream info!");
     }
 
-    char  *stt = "aaaaaa";
-    char buf[100] = {0};
-    sprintf(buf,"%s",stt);
+    char buf[10000] = {0};
+    sprintf(buf,"%s",avFormatContext->filename);
 
     return (*env)->NewStringUTF(env,&buf);
 }

@@ -34,8 +34,6 @@ LOCAL_LDLIBS += -llog -lz -landroid
 LOCAL_MODULE := testFFmpeg
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/FFmpeg/include
 
-LOCAL_CFLAGS       := -DANDROID -D__STDC_CONSTANT_MACROS -std=gnu11
-
 LOCAL_SHARED_LIBRARIES:= avcodec avformat avutil swresample swscale
 
 include $(BUILD_SHARED_LIBRARY)

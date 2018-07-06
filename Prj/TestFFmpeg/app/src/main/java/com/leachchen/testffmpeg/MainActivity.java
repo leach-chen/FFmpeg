@@ -14,8 +14,20 @@ public class MainActivity extends AppCompatActivity {
         this.findViewById(R.id.btn_exec).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getVideoInfo("/sdcard/vavadash/20171221_151133_003.MP4");
-                //Toast.makeText(MainActivity.this,getVideoInfo("/sdcard/vavadash/20171221_151133_003.MP4"),Toast.LENGTH_LONG).show();
+                //getVideoInfo("/sdcard/vavadash/20171221_151133_003.MP4");
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        MainActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(MainActivity.this,getVideoInfo("/sdcard/vavadash/a.mp4"),Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
+                }).start();
+
             }
         });
     }
