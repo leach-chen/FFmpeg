@@ -68,7 +68,7 @@ Java_com_leachchen_testffmpeg_MainActivity_getVideoInfo(JNIEnv *env, jobject ins
 
     int autioIndex = -1;
     for (int i = 0; i < avFormatContext->nb_streams; i++) {
-        if (avFormatContext->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO)        //为视频流类型
+        if (avFormatContext->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO)        //为音频流类型
         {
             autioIndex = i;
             break;
